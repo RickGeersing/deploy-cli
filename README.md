@@ -6,6 +6,16 @@ To install dependencies:
 bun install
 ```
 
+To run migrations
+```bash
+bun prisma migrate dev
+```
+
+To generate client
+```bash
+bun prisma generate
+```
+
 To run:
 
 ```bash
