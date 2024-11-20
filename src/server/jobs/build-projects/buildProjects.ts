@@ -1,7 +1,7 @@
 import type { Build } from "@prisma/client";
 import { BuildStatus } from "../../../utilities/builds/buildStatus";
 import { getBuildsByStatus } from "../../../utilities/builds/getBuildsByStatus";
-import { updateBuildStatusBulk } from "../../../utilities/builds/updateBuildStatus";
+import { updateBuildStatus, updateBuildStatusBulk } from "../../../utilities/builds/updateBuildStatus";
 import { logger } from "../../../utilities/logging";
 import { checkWorkingDirectory } from "../../../utilities/checkWorkingDirectory";
 import { getProjectById } from "../../../utilities/project/getProjectById";
@@ -24,7 +24,7 @@ export async function buildProjects(): Promise<void> {
             );
 
         if (pendingBuilds.length === 0) {
-            logger.info("No pending builds to run at the moment, aborting ...");
+            logger.info("[BUILD] No pending builds to run at the moment, aborting ...");
             return;
         }
 
@@ -55,7 +55,7 @@ export async function buildProjects(): Promise<void> {
             .slice(0, Number(process.env.MAX_CONCURRENT_BUILDS) - runningBuilds.length);
 
         if (buildsToRun.length === 0) {
-            logger.info("No builds can be run at the moment, aborting ...");
+            logger.info("[BUILD] No builds can be run at the moment, aborting ...");
             return;
         }
 
@@ -74,22 +74,27 @@ async function buildProject(build: Build): Promise<void> {
             throw new BuildProjectError(`Project with id ${build.projectId} not found`, build.projectId);
         }
 
+        logger.info(`[BUILD] Starting build for project ${project.name}`);
         await checkWorkingDirectory(project.path);
         await checkRepositoryInDirectory(project.path);
         const config = await readDeployConfig(project.path);
 
         for (const command of config.commands) {
             try {
-                logger.info(`Running command: ${command} for project ${project.name}`);
-                await $`${command}`.cwd(project.path)
+                logger.info(`[BUILD] Running command: ${command} for project ${project.name}`);
+                await $`${{ raw: command }}`.cwd(project.path).quiet();
             } catch (error) {
-                throw new BuildProjectError(`Failed to run command ${command}`, project.name);
+                throw new BuildProjectError(`Failed to run command ${command}`, project.id, project.name);
             }
         }
 
+        await updateBuildStatus(build.id, BuildStatus.SUCCESS);
+        logger.info(`[BUILD] Successfully built project ${project.name}`);
+
     } catch (error) {
         if (error instanceof BuildProjectError) {
-            logger.error(`Failed to build project ${error.projectName}: ${error.message}`);
+            await updateBuildStatus(build.id, BuildStatus.FAILED);
+            logger.error(`[BUILD] Failed to build project ${error.projectName ?? error.projectId}: ${error.message}`);
         }
     }
 }

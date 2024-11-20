@@ -1,6 +1,6 @@
 export enum BuildStatus {
     SUCCESS = "SUCCESS",
-    FAILURE = "FAILURE",
+    FAILED = "FAILED",
     PENDING = "PENDING",
     RUNNING = "RUNNING",
     CANCELLED = "CANCELLED",

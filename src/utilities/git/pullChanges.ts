@@ -1,9 +1,10 @@
 import type { Project } from "@prisma/client";
 import { $ } from "bun";
+import { logger } from "../logging";
 
 export async function pullChanges(project: Project) {
     try {
-        console.log(`Pulling latest changes for "${project.name}" ...`);
+        logger.info(`[UPDATE] Pulling latest changes for "${project.name}" ...`);
         await $`git pull`.cwd(project.path).quiet();
     }
     catch (e) {

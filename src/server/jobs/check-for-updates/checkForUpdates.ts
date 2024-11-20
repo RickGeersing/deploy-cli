@@ -26,7 +26,7 @@ export async function checkForUpdates() {
                 if (!localCommitBuild) {
                     await createBuildEntry(project, commits.localHash);
                 } else {
-                    logger.info(`No new commits in ${project.name}, skipping ...`);
+                    logger.info(`[UPDATE] No new commits in ${project.name}, skipping ...`);
                 }
             } else {
                 await pullChanges(project);
@@ -35,7 +35,7 @@ export async function checkForUpdates() {
 
         } catch (e) {
             if (e instanceof Error) {
-                logger.error(e.message);
+                logger.error(`[UPDATE] ${e.message}`);
             }
         }
     }));
