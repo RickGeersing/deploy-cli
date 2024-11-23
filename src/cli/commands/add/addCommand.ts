@@ -9,7 +9,7 @@ import { commands } from "../commands";
 
 export async function addCommand(args: CommandLineArgs): Promise<void> {
     if (args.positionals.length === 3) {
-        throw new MissingArgumentError('path', commands.add.usage);
+        throw new MissingArgumentError('path', commands, commands.add.usage);
     }
 
     const path = args.positionals[3];

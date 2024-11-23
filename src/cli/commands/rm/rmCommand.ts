@@ -6,7 +6,7 @@ import { commands } from "../commands";
 
 export async function rmCommand(args: CommandLineArgs): Promise<void> {
     if (args.positionals.length === 3) {
-        throw new MissingArgumentError('name', commands.rm.usage);
+        throw new MissingArgumentError('name', commands, commands.rm.usage);
     }
 
     const name = args.positionals[3];

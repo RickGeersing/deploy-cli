@@ -7,6 +7,8 @@ import { lsCommand } from "./commands/ls/lsCommand";
 import { rmCommand } from "./commands/rm/rmCommand";
 import { addCommand } from "./commands/add/addCommand";
 import { logCommands } from "./logging/logCommands";
+import { buildCommand } from './commands/build/buildCommand';
+import { commands } from './commands/commands';
 
 async function main() {
     try {
@@ -19,8 +21,8 @@ async function main() {
         }
 
         if (e instanceof IncorrectUsageError) {
-            console.log(`\n${e.usage}\n`)
-            logCommands();
+            console.log(`\nUsage: ${e.usage}\n`)
+            logCommands(e.commands);
         }
     }
 }
@@ -28,7 +30,7 @@ async function main() {
 
 async function run(args: CommandLineArgs): Promise<void> {
     if (args.positionals.length === 2) {
-        throw new MissingArgumentError('command');
+        throw new MissingArgumentError('command', commands);
     }
 
     switch (args.positionals[2]) {
@@ -41,11 +43,14 @@ async function run(args: CommandLineArgs): Promise<void> {
         case "rm":
             await rmCommand(args);
             break;
+        case "build":
+            await buildCommand(args);
+            break;
         case "help":
-            logCommands();
+            logCommands(commands);
             break;
         default:
-            throw new UnknownCommandError(args.positionals[2]);
+            throw new UnknownCommandError(args.positionals[2], commands, 'deploy <command> [options]');
     }
 }
 

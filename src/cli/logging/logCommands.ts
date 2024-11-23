@@ -1,6 +1,9 @@
-import { commands } from "../commands/commands";
+export type CommandInformation = {
+    usage: string;
+    description: string;
+}
 
-export function logCommands() {
+export function logCommands(commands: Record<string, CommandInformation>): void {
     const cmds = Object.entries(commands);
     const longestUsage = cmds.reduce((acc, [_, { usage }]) => usage.length > acc ? usage.length : acc, 0);
 
