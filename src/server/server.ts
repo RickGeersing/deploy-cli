@@ -15,7 +15,7 @@ new Elysia()
     .use(
         cron({
             name: 'buildProjects',
-            pattern: Patterns.everySenconds(Number(process.env.UPDATE_INTERVAL)),
+            pattern: Patterns.everyMinutes(Number(process.env.UPDATE_INTERVAL)),
             run() {
                 buildProjects()
             }
@@ -24,7 +24,7 @@ new Elysia()
     .use(
         cron({
             name: 'checkForUpdates',
-            pattern: Patterns.everySenconds(Number(process.env.UPDATE_INTERVAL)),
+            pattern: Patterns.everyMinutes(Number(process.env.UPDATE_INTERVAL)),
             run() {
                 checkForUpdates()
             }
