@@ -3,12 +3,10 @@ import { BuildStatus } from "../../../utilities/builds/buildStatus";
 import { getBuildsByStatus } from "../../../utilities/builds/getBuildsByStatus";
 import { updateBuildStatus, updateBuildStatusBulk } from "../../../utilities/builds/updateBuildStatus";
 import { logger } from "../../../utilities/logging";
-import { checkWorkingDirectory } from "../../../utilities/checkWorkingDirectory";
 import { getProjectById } from "../../../utilities/project/getProjectById";
 import { BuildProjectError } from "../../errors/buildProjectError";
-import { checkRepositoryInDirectory } from "../../../utilities/git/checkRepositoryInDirectory";
-import { readDeployConfig } from "../../../utilities/readDeployConfig";
 import { $ } from "bun";
+import { projectPrechecks } from "../../../utilities/project/projectPrechecks";
 
 
 export async function buildProjects(): Promise<void> {
@@ -75,9 +73,7 @@ async function buildProject(build: Build): Promise<void> {
         }
 
         logger.info(`[BUILD] Starting build for project ${project.name}`);
-        await checkWorkingDirectory(project.path);
-        await checkRepositoryInDirectory(project.path);
-        const config = await readDeployConfig(project.path);
+        const config = await projectPrechecks(project.path);
 
         for (const command of config.commands) {
             try {

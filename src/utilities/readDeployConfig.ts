@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-const deployConfigSchema = z.object({
+export const deployConfigSchema = z.object({
     name: z.string(),
     commands: z.array(z.string())
 });

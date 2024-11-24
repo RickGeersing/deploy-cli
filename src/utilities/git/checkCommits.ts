@@ -4,8 +4,6 @@ import { logger } from "../logging";
 
 export async function checkCommits(project: Project): Promise<{ localHash: string, remoteHash: string }> {
     try {
-        logger.info(`[UPDATE] Checking for new commits on "${project.name}" ...`);
-
         await $`git fetch --all`.cwd(project.path).quiet();
         const branch = await currentBranch(project.path);
 

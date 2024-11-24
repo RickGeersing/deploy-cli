@@ -1,9 +1,7 @@
-import { checkWorkingDirectory } from "../../../utilities/checkWorkingDirectory";
-import { checkRepositoryInDirectory } from "../../../utilities/git/checkRepositoryInDirectory";
 import type { CommandLineArgs } from "../../../utilities/parseCommandLineArgs";
 import { addProject } from "../../../utilities/project/addProject";
 import { getProjectByName } from "../../../utilities/project/getProjectByName";
-import { readDeployConfig } from "../../../utilities/readDeployConfig";
+import { projectPrechecks } from "../../../utilities/project/projectPrechecks";
 import { MissingArgumentError } from "../../errors/missingArgumentError";
 import { commands } from "../commands";
 
@@ -13,10 +11,7 @@ export async function addCommand(args: CommandLineArgs): Promise<void> {
     }
 
     const path = args.positionals[3];
-
-    await checkWorkingDirectory(path);
-    await checkRepositoryInDirectory(path);
-    const config = await readDeployConfig(path);
+    const config = await projectPrechecks(path)
 
     const name = args.positionals[4] || config.name;
     const project = await getProjectByName(name);
